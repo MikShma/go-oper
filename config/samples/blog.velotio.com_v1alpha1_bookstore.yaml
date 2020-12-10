@@ -1,0 +1,7 @@
+apiVersion: blog.velotio.com.blog.velotio.com/v1alpha1
+kind: BookStore
+metadata:
+  name: bookstore-sample
+spec:
+  # Add fields here
+  foo: bar
