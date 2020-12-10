@@ -26,31 +26,38 @@ import (
 
 	blogvelotiocomv1alpha1 "github.com/Mshmatko/Bookstore/api/v1alpha1"
 
-	blogv1alpha1 "github.com/Mshmatko/Bookstore/api/v1alpha1"
+	//blogv1alpha1 "github.com/Mshmatko/Bookstore/api/v1alpha1"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	"k8s.io/apimachinery/pkg/runtime"
+
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"reflect"
+
 	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
+	//"sigs.k8s.io/controller-runtime/pkg/controller"
+
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
-	"sigs.k8s.io/controller-runtime/pkg/handler"
+
+	//"sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
+	//"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
-	"sigs.k8s.io/controller-runtime/pkg/source"
+	//"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
+/*
 // BookStoreReconciler reconciles a BookStore object
 type BookStoreReconciler struct {
 	client.Client
 	Log    logr.Logger
 	Scheme *runtime.Scheme
+
 }
 
 // +kubebuilder:rbac:groups=blog.velotio.com.blog.velotio.com,resources=bookstores,verbs=get;list;watch;create;update;patch;delete
@@ -65,11 +72,14 @@ func (r *BookStoreReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	return ctrl.Result{}, nil
 }
 
+
+
 func (r *BookStoreReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&blogvelotiocomv1alpha1.BookStore{}).
 		Complete(r)
 }
+*/
 
 var log = logf.Log.WithName("controller_bookstore")
 
@@ -80,6 +90,7 @@ var log = logf.Log.WithName("controller_bookstore")
 
 // Add creates a new BookStore Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
+/*
 func Add(mgr manager.Manager) error {
 	return add(mgr, newReconciler(mgr))
 }
@@ -98,7 +109,7 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	}
 
 	// Watch for changes to primary resource BookStore
-	err = c.Watch(&source.Kind{Type: &blogv1alpha1.BookStore{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &blogvelotiocomv1alpha1.BookStore{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -106,15 +117,36 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 }
 
 // blank assignment to verify that ReconcileBookStore implements reconcile.Reconciler
+*/
+
 var _ reconcile.Reconciler = &ReconcileBookStore{}
 
 // ReconcileBookStore reconciles a BookStore object
+
 type ReconcileBookStore struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
+	Client client.Client
+	Scheme *runtime.Scheme
+
+	//client.Client
+	Log logr.Logger
+	//Scheme *runtime.Scheme
 }
+
+/*
+// +kubebuilder:rbac:groups=blog.velotio.com.blog.velotio.com,resources=bookstores,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=blog.velotio.com.blog.velotio.com,resources=bookstores/status,verbs=get;update;patch
+
+func (r *ReconcileBookStore) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+	_ = context.Background()
+	_ = r.Log.WithValues("bookstore", req.NamespacedName)
+
+	// your logic here
+
+	return ctrl.Result{}, nil
+}
+*/
 
 // Reconcile reads that state of the cluster for a BookStore object and makes changes based on the state read
 // and what is in the BookStore.Spec
@@ -123,42 +155,52 @@ type ReconcileBookStore struct {
 // Note:
 // The Controller will requeue the Request to be processed again if the returned error is non-nil or
 // Result.Requeue is true, otherwise upon completion it will remove the work from the queue.
-func (r *ReconcileBookStore) Reconcile(request reconcile.Request) (reconcile.Result, error) {
-	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
+
+// +kubebuilder:rbac:groups=blog.velotio.com.blog.velotio.com,resources=bookstores,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=blog.velotio.com.blog.velotio.com,resources=bookstores/status,verbs=get;update;patch
+
+//func (r *ReconcileBookStore) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+
+func (r *ReconcileBookStore) Reconcile(req ctrl.Request) (ctrl.Result, error) {
+
+	_ = context.Background()
+	_ = r.Log.WithValues("bookstore", req.NamespacedName)
+
+	reqLogger := log.WithValues("Request.Namespace", req.Namespace, "Request.Name", req.Name)
 	reqLogger.Info("Reconciling BookStore")
 
 	// Fetch the BookStore instance
-	instance := &blogv1alpha1.BookStore{}
-	err := r.client.Get(context.TODO(), request.NamespacedName, instance)
+	instance := &blogvelotiocomv1alpha1.BookStore{}
+	err := r.Client.Get(context.TODO(), req.NamespacedName, instance)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			// Request object not found, could have been deleted after reconcile request.
 			// Owned objects are automatically garbage collected. For additional cleanup logic use finalizers.
 			// Return and don't requeue
-			return reconcile.Result{}, nil
+			return ctrl.Result{}, nil
 		}
 		// Error reading the object - requeue the request.
 		reqLogger.Error(err, "Failed to get bookstore object")
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
 	err = r.BookStore(instance)
 	if err != nil {
 		reqLogger.Error(err, "Failed to create/update bookstore resources")
-		return reconcile.Result{}, err
+		return ctrl.Result{}, err
 	}
-	_ = r.client.Status().Update(context.TODO(), instance)
-	return reconcile.Result{}, nil
+	_ = r.Client.Status().Update(context.TODO(), instance)
+	return ctrl.Result{}, nil
 }
 
-func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error {
+func (r *ReconcileBookStore) BookStore(bookstore *blogvelotiocomv1alpha1.BookStore) error {
 	reqLogger := log.WithValues("Namespace", bookstore.Namespace)
 	mongoDBSvc := getmongoDBSvc(bookstore)
 	msvc := &corev1.Service{}
-	err := r.client.Get(context.TODO(), types.NamespacedName{Name: "mongodb-service", Namespace: bookstore.Namespace}, msvc)
+	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: "mongodb-service", Namespace: bookstore.Namespace}, msvc)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			controllerutil.SetControllerReference(bookstore, mongoDBSvc, r.scheme)
-			err = r.client.Create(context.TODO(), mongoDBSvc)
+			controllerutil.SetControllerReference(bookstore, mongoDBSvc, r.Scheme)
+			err = r.Client.Create(context.TODO(), mongoDBSvc)
 			if err != nil {
 				return err
 			}
@@ -167,8 +209,8 @@ func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error 
 		}
 	} else if !reflect.DeepEqual(mongoDBSvc.Spec, msvc.Spec) {
 		mongoDBSvc.ObjectMeta = msvc.ObjectMeta
-		controllerutil.SetControllerReference(bookstore, mongoDBSvc, r.scheme)
-		err = r.client.Update(context.TODO(), mongoDBSvc)
+		controllerutil.SetControllerReference(bookstore, mongoDBSvc, r.Scheme)
+		err = r.Client.Update(context.TODO(), mongoDBSvc)
 		if err != nil {
 			return err
 		}
@@ -176,12 +218,12 @@ func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error 
 	}
 	mongoDBSS := getMongoDBStatefulsets(bookstore)
 	mss := &appsv1.StatefulSet{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: "mongodb", Namespace: bookstore.Namespace}, mss)
+	err = r.Client.Get(context.TODO(), types.NamespacedName{Name: "mongodb", Namespace: bookstore.Namespace}, mss)
 	if err != nil {
 		if errors.IsNotFound(err) {
 			reqLogger.Info("mongodb statefulset not found, will be created")
-			controllerutil.SetControllerReference(bookstore, mongoDBSS, r.scheme)
-			err = r.client.Create(context.TODO(), mongoDBSS)
+			controllerutil.SetControllerReference(bookstore, mongoDBSS, r.Scheme)
+			err = r.Client.Create(context.TODO(), mongoDBSS)
 			if err != nil {
 				return err
 			}
@@ -193,8 +235,8 @@ func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error 
 		r.UpdateVolume(bookstore)
 		mongoDBSS.ObjectMeta = mss.ObjectMeta
 		mongoDBSS.Spec.VolumeClaimTemplates = mss.Spec.VolumeClaimTemplates
-		controllerutil.SetControllerReference(bookstore, mongoDBSS, r.scheme)
-		err = r.client.Update(context.TODO(), mongoDBSS)
+		controllerutil.SetControllerReference(bookstore, mongoDBSS, r.Scheme)
+		err = r.Client.Update(context.TODO(), mongoDBSS)
 		if err != nil {
 			return err
 		}
@@ -202,11 +244,11 @@ func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error 
 	}
 	bookStoreSvc := getBookStoreAppSvc(bookstore)
 	bsvc := &corev1.Service{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: "bookstore-svc", Namespace: bookstore.Namespace}, bsvc)
+	err = r.Client.Get(context.TODO(), types.NamespacedName{Name: "bookstore-svc", Namespace: bookstore.Namespace}, bsvc)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			controllerutil.SetControllerReference(bookstore, bookStoreSvc, r.scheme)
-			err = r.client.Create(context.TODO(), bookStoreSvc)
+			controllerutil.SetControllerReference(bookstore, bookStoreSvc, r.Scheme)
+			err = r.Client.Create(context.TODO(), bookStoreSvc)
 			if err != nil {
 				return err
 			}
@@ -217,8 +259,8 @@ func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error 
 	} else if !reflect.DeepEqual(bookStoreSvc.Spec, bsvc.Spec) {
 		bookStoreSvc.ObjectMeta = bsvc.ObjectMeta
 		bookStoreSvc.Spec.ClusterIP = bsvc.Spec.ClusterIP
-		controllerutil.SetControllerReference(bookstore, bookStoreSvc, r.scheme)
-		err = r.client.Update(context.TODO(), bookStoreSvc)
+		controllerutil.SetControllerReference(bookstore, bookStoreSvc, r.Scheme)
+		err = r.Client.Update(context.TODO(), bookStoreSvc)
 		if err != nil {
 			return err
 		}
@@ -226,11 +268,11 @@ func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error 
 	}
 	bookStoreDep := getBookStoreDeploy(bookstore)
 	bsdep := &appsv1.Deployment{}
-	err = r.client.Get(context.TODO(), types.NamespacedName{Name: "bookstore", Namespace: bookstore.Namespace}, bsdep)
+	err = r.Client.Get(context.TODO(), types.NamespacedName{Name: "bookstore", Namespace: bookstore.Namespace}, bsdep)
 	if err != nil {
 		if errors.IsNotFound(err) {
-			controllerutil.SetControllerReference(bookstore, bookStoreDep, r.scheme)
-			err = r.client.Create(context.TODO(), bookStoreDep)
+			controllerutil.SetControllerReference(bookstore, bookStoreDep, r.Scheme)
+			err = r.Client.Create(context.TODO(), bookStoreDep)
 			if err != nil {
 				return err
 			}
@@ -240,18 +282,18 @@ func (r *ReconcileBookStore) BookStore(bookstore *blogv1alpha1.BookStore) error 
 		}
 	} else if !reflect.DeepEqual(bookStoreDep.Spec, bsdep.Spec) {
 		bookStoreDep.ObjectMeta = bsdep.ObjectMeta
-		controllerutil.SetControllerReference(bookstore, bookStoreDep, r.scheme)
-		err = r.client.Update(context.TODO(), bookStoreDep)
+		controllerutil.SetControllerReference(bookstore, bookStoreDep, r.Scheme)
+		err = r.Client.Update(context.TODO(), bookStoreDep)
 		if err != nil {
 			return err
 		}
 		reqLogger.Info("bookstore deployment updated")
 	}
-	r.client.Status().Update(context.TODO(), bookstore)
+	r.Client.Status().Update(context.TODO(), bookstore)
 	return nil
 }
 
-func getBookStoreAppSvc(bookstore *blogv1alpha1.BookStore) *corev1.Service {
+func getBookStoreAppSvc(bookstore *blogvelotiocomv1alpha1.BookStore) *corev1.Service {
 
 	p := make([]corev1.ServicePort, 0)
 	servicePort := corev1.ServicePort{
@@ -279,7 +321,7 @@ func getBookStoreAppSvc(bookstore *blogv1alpha1.BookStore) *corev1.Service {
 	return bookStoreSvc
 }
 
-func getmongoDBSvc(bookstore *blogv1alpha1.BookStore) *corev1.Service {
+func getmongoDBSvc(bookstore *blogvelotiocomv1alpha1.BookStore) *corev1.Service {
 
 	p := make([]corev1.ServicePort, 0)
 	servicePort := corev1.ServicePort{
@@ -306,7 +348,7 @@ func getmongoDBSvc(bookstore *blogv1alpha1.BookStore) *corev1.Service {
 	return mongoDBSvc
 }
 
-func getBookStoreDeploy(bookstore *blogv1alpha1.BookStore) *appsv1.Deployment {
+func getBookStoreDeploy(bookstore *blogvelotiocomv1alpha1.BookStore) *appsv1.Deployment {
 
 	cnts := make([]corev1.Container, 0)
 	cnt := corev1.Container{
@@ -343,7 +385,7 @@ func getBookStoreDeploy(bookstore *blogv1alpha1.BookStore) *appsv1.Deployment {
 	}
 	return dep
 }
-func getMongoDBStatefulsets(bookstore *blogv1alpha1.BookStore) *appsv1.StatefulSet {
+func getMongoDBStatefulsets(bookstore *blogvelotiocomv1alpha1.BookStore) *appsv1.StatefulSet {
 
 	cnts := make([]corev1.Container, 0)
 	cnt := corev1.Container{
@@ -409,18 +451,18 @@ func volClaimTemplate(DBSize resource.Quantity) []corev1.PersistentVolumeClaim {
 	pvcList = append(pvcList, mongopvc)
 	return pvcList
 }
-func (r *ReconcileBookStore) UpdateVolume(bookstore *blogv1alpha1.BookStore) error {
+func (r *ReconcileBookStore) UpdateVolume(bookstore *blogvelotiocomv1alpha1.BookStore) error {
 
 	reqLogger := log.WithValues("Namespace", bookstore.Namespace)
 	mpvc := &corev1.PersistentVolumeClaim{}
-	err := r.client.Get(context.TODO(), types.NamespacedName{Name: "mongodb-pvc-mongodb-0", Namespace: bookstore.Namespace}, mpvc)
+	err := r.Client.Get(context.TODO(), types.NamespacedName{Name: "mongodb-pvc-mongodb-0", Namespace: bookstore.Namespace}, mpvc)
 	if err != nil {
 		return nil
 	}
 	if mpvc.Spec.Resources.Requests[corev1.ResourceStorage] != bookstore.Spec.BookDB.DBSize {
 		reqLogger.Info("Need to expand the mongodb volume")
 		mpvc.Spec.Resources.Requests[corev1.ResourceStorage] = bookstore.Spec.BookDB.DBSize
-		err := r.client.Update(context.TODO(), mpvc)
+		err := r.Client.Update(context.TODO(), mpvc)
 		if err != nil {
 			reqLogger.Info("Error in expanding the mongodb volume")
 			return err
@@ -428,4 +470,10 @@ func (r *ReconcileBookStore) UpdateVolume(bookstore *blogv1alpha1.BookStore) err
 		reqLogger.Info("mongodb volume updated successfully")
 	}
 	return nil
+}
+
+func (r *ReconcileBookStore) SetupWithManager(mgr ctrl.Manager) error {
+	return ctrl.NewControllerManagedBy(mgr).
+		For(&blogvelotiocomv1alpha1.BookStore{}).
+		Complete(r)
 }
